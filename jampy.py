@@ -20,6 +20,15 @@ class Tokenizer:
         self.pos = 0
         self.posValue = None
         self.current_char()
+        self.tokens = []
+        self.duoPairs = {
+            'o': 'r',
+            '!': '=',
+            '+': '=',
+            '-': '=',
+            '=': '=',
+            "&": "&",
+        }
 
     def current_char(self):
         if self.pos < len(self.text):
@@ -51,8 +60,7 @@ class Tokenizer:
             print("Start of sequence")
 
     def seperate(self):
-        self.tokens = [0]
-        ignore = "\n \t"
+        ignore = " \t"
         symbols = "()[]}{,;:+-*&!=o"
         
         while True:
@@ -73,21 +81,15 @@ class Tokenizer:
 
         for i in range(len(self.tokens)):
             print(self.tokens[i].display())
+            
 
     def testDuo(self):
-        duoPairs = {
-            'o': 'r',
-            '!': '=',
-            '+': '=',
-            '-': '=',
-            '=': '=',
-            "&": "&",
-        }
 
         if self.current_char() in duoPairs.keys():
             if self.next_char() == duoPairs.get(self.current_char()):
                 self.tokens.append(Token("operator","{self.current_char()}{self.next_char()}"))
-                self.forward()
+                if self.next_char() != -1:
+                    self.forward()
             else:
                 self.tokens.append(Token("operator", self.current_char()))
                 if self.next_char() != -1:
@@ -97,6 +99,6 @@ class Tokenizer:
         self.tokens.append(Token("int", int(self.current_char())))
         self.forward()
 
-tk = Tokenizer(" + - = ! 1 3 = 1 +=")
+tk = Tokenizer(" + - = ! 1 3 -= 1 +")
 
 tk.seperate()
