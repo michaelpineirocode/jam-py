@@ -1,25 +1,25 @@
 INTEGERS = "0123456789"
+STRING_DELLIMINATOR = '"'
 
 class Token:
-    def __init__(self, KW_type, value):
+    def __init__(self, KW_type, value):  #takes a type and a value
         self.KW_type = KW_type
         self.value = value
 
-
     def display(self):
         if self.value:
-            return {self.KW_type: self.value}
+            return {self.KW_type: self.value} #if there is a value, displays the type and value
         else:
-            return {self.KW_type: None}
+            return {self.KW_type: None} #displays just the type
     
 
 class Tokenizer:
 
     def __init__(self, text):
-        self.text = text
-        self.pos = 0
-        self.posValue = None
-        self.current_char()
+        self.text = text #pulls the text
+        self.pos = 0 #current position
+        self.current_char() #pulls the character at 0 in the string
+        self.seperate() #starts the main seperator
 
     def current_char(self):
         if self.pos < len(self.text):
@@ -42,7 +42,6 @@ class Tokenizer:
             self.pos += 1
         else:
             return "end of sequence"
-            print("End of sequence")
 
     def back(self):
         if self.pos > 0:
@@ -50,10 +49,12 @@ class Tokenizer:
         else:
             print("Start of sequence")
 
+    def symbols(self):
+        return "()[]}{,;:+-*&!=o"
+
     def seperate(self):
-        self.tokens = [0]
-        ignore = "\n \t"
-        symbols = "()[]}{,;:+-*&!=o"
+        self.tokens = []
+        ignore = " \t"
         
         while True:
             
@@ -64,15 +65,16 @@ class Tokenizer:
                     break
             elif self.current_char() in ignore:
                 self.forward()
-            elif self.current_char() in symbols:
+            elif self.current_char() in self.symbols():
                 self.testDuo()
-            elif self.current_char() in INTEGERS:
-                self.addInt()
+            elif self.current_char() in STRING_DELLIMINATOR:
+                self.addString()
             elif self.next_char() == -1:
                 break
 
         for i in range(len(self.tokens)):
-            print(self.tokens[i].display())
+            print(self.tokens[i].display()) #print the return of the display attribute in each token
+            
 
     def testDuo(self):
         duoPairs = {
@@ -84,19 +86,30 @@ class Tokenizer:
             "&": "&",
         }
 
-        if self.current_char() in duoPairs.keys():
-            if self.next_char() == duoPairs.get(self.current_char()):
-                self.tokens.append(Token("operator","{self.current_char()}{self.next_char()}"))
-                self.forward()
-            else:
-                self.tokens.append(Token("operator", self.current_char()))
-                if self.next_char() != -1:
-                    self.forward()
-
-    def addInt(self):
-        self.tokens.append(Token("int", int(self.current_char())))
+        char = self.current_char()
+        
+        if char in duoPairs.keys():
+            if self.next_char() == duoPairs[char]:
+                self.tokens.append(Token("bichar operator", char + self.next_char()))
+            elif char != duoPairs[char]:
+                self.tokens.append(Token("onechar operator", char))
+        else:
+            self.tokens.append(Token("symbol", char))
+        
         self.forward()
 
-tk = Tokenizer(" + - = ! 1 3 = 1 +=")
+    def addString(self):
+        kw_string=[]
+        start_pos = self.pos
+        while True:
+            self.forward()
+            if self.current_char() == STRING_DELLIMINATOR:
+                endString = self.pos
+                self.forward()
+                break
+        for i in range(endString - (start_pos - 1)):
+            kw_string.append(self.text[start_pos + i])
+        kw_string = "".join(kw_string)
+            
+        self.tokens.append(Token("string", kw_string))
 
-tk.seperate()
