@@ -1,7 +1,7 @@
 #public variables. the deliminators do not need to be, but in case I want to change them later.
 INTEGERS = "0123456789"
 STRING_DELIMINATOR = '"'
-EOF_DELIMINATOR = ';'
+EOL_DELIMINATOR = ';'
 
 class Token:
     def __init__(self, KW_type, value):  #takes a type and a value
@@ -54,7 +54,7 @@ class Tokenizer:
         self.tokens = []
         ignore = " \t\n"
         statements = "iwlrf"
-        symbols = "()[]}{,:+-*&!=o."
+        symbols = "()[]}{,:+-*&!|=/.><"
         bools = "TF"
 
         while True:
@@ -68,13 +68,13 @@ class Tokenizer:
                     break
             elif char in ignore:
                 self.forward()
-            elif char in symbols and self.testDuo() != -1:
-                self.testDuo()
+            elif char in symbols:
+                self.addOperators()
             elif char == STRING_DELIMINATOR:
                 self.addString()
             elif char in statements and self.addStatements() != -1:
                 self.addStatements()
-            elif char == EOF_DELIMINATOR:
+            elif char == EOL_DELIMINATOR:
                 self.semicolon()
             elif char in INTEGERS:
                 self.addInt()
@@ -88,44 +88,40 @@ class Tokenizer:
         for i in range(len(self.tokens)):
             print(self.tokens[i].display()) #print the return of the display attribute in each token
 
-    def testDuo(self):
-        '''
-        This function is complicated, so I will explain it here. I start off with
-        a switch table of possible values depending on the first letter presented. 
-        Then, I test to see if the character matches up with the switch table. If it does,
-        then I check if the next character is a corresponding value in the table. If so,
-        it appends and moves forward so that it will 'skip' the second character. Then I test
-        if the character is only a key value and also not an 'o' (because o is not an operator),
-        and if so it is an operator but only one character. Finally, if none of those are true,
-        such as being a parenthesis, it will label it as a 'symbol,' although I am going to change
-        that later.
-        '''
+    def addOperators(self):
         
-        duoPairs = { #list of all two word combos 
-            'o': 'r',        ''' I want to change this later, to be like the statements, and change && to 'and' '''
-            '!': '=',
-            '+': '=',
-            '-': '=',
-            '=': '=',
-            "&": "&",
-        }
-
-        char = self.current_char() #sets the current character so that I do not need to recalculate
-        
-        if char in duoPairs.keys(): #tests if the character is in switch table
-            if self.next_char() == duoPairs[char]: #tests if next character is the corresponding value
-                self.tokens.append(Token("bichar operator", char + self.next_char()))
-                self.forward() #moves forward once, to the next character
-            elif char != duoPairs[char] and char != "o" and char != '!': #if it's a key but not a value and the key isn't o
-                self.tokens.append(Token("onechar operator", char))
-            else:
-                self.back()
-                return -1
+        relational_operators = { #list of all two word combos 
+            '|': '||',
+            '!': '!=',
+            '+': '+=',
+            '-': '-=',
+            '=': '==',
+            "&": "&&",
+            "<": "<=",
+            ">": ">="                                                                                                                                                                                                      
+            }
+            
+        char = self.current_char()
+        if char in relational_operators.keys():
+            if self.next_char() == relational_operators[char][1]:
+                if char == '<' or char == '>' or char == '=' or char == '!':
+                    self.tokens.append(Token("relational operator", char + self.next_char()))
+                elif char == '&' or char == '|':
+                    self.tokens.append(Token("logical operator", char + self.next_char()))
+                elif char == "-" or char == "+":
+                    self.tokens.append(Token("arithmetic operator", char + self.next_char()))
+                self.forward()
+            elif char == "=":
+                self.tokens.append(Token("assignment", char))
+            elif char == '+' or char == '-' or char:
+                self.tokens.append(Token("arithmetic operator", char))
+        elif char == '*' or char =='/':
+            self.tokens.append(Token("arithmetic operator", char))
         else:
-            self.tokens.append(Token("symbol", char)) #if not just consider it a symbol(to be changed later)
-        
-        self.forward() #moves forward to the next text
+            self.tokens.append(Token("symbol", char))
 
+        self.forward()
+                
     def addString(self):
         kw_string=[]
         start_pos = self.pos
@@ -148,7 +144,8 @@ class Tokenizer:
             "w": "while",
             "r": "return",
             "l": "let",
-            "f": "for"
+            "f": "for",
+            "i": "if"
         }
     
         starting_char = char
@@ -159,19 +156,16 @@ class Tokenizer:
                 if char == possible_statements_from_char[starting_char][i]:
                     state.append(char)
                     self.forward()
+                elif str(char) in '\n\t ' or self.pos == len(self.text):
+                    if "".join(state) == possible_statements_from_char[starting_char]:
+                        self.tokens.append(Token("statement", state))
                 else:
-                    backpedal = i
-                    break
-            state = "".join(state)
-            if state == possible_statements_from_char[starting_char]:
-                self.tokens.append(Token("statement", state))
-            else:
-                for i in range(backpedal):
-                    self.back()
-                    return -1
+                    for x in range(i):
+                        self.back()
+                        return -1
 
     def semicolon(self):
-        self.tokens.append(Token("eof deliminator", EOF_DELIMINATOR))
+        self.tokens.append(Token("eol deliminator", EOL_DELIMINATOR))
         self.forward()
 
     def addInt(self):
@@ -185,7 +179,7 @@ class Tokenizer:
                 break
 
         number = "".join(number)
-        self.tokens.append(Token("integer", int(number)))
+        self.tokens.append(Token("integer", number))
         self.forward()
 
     def addBool(self):
@@ -224,6 +218,7 @@ class Tokenizer:
                     self.back()
 
     def addExpression(self):
+
         letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_-" #should this be public?
         expression = []
         while True:
