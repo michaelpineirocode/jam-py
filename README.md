@@ -6,7 +6,7 @@ Jam-py is a <b>proof of concept/educational experience</b> to learn the fundemen
 
 # Install
 Jampy relies on the "os" module for the "clear" command within the shell, so "clear" will not work on Linux or Unix systems.
-<b> GIT INSTALL:</b> git clone https://github.com/michaelpineirocode/jampy.git
+<b> GIT INSTALL:</b> git clone https://github.com/michaelpineirocode/jampy.git .
 <b> ZIP INSTALL:</b> Click on the green "download" button at the top of the repository, select "ZIP" and download. Find the directory of the download and decompress.
 
 # Shell commands
