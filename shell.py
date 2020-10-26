@@ -1,24 +1,27 @@
 import jampy as jam #imports main tokenizer file
+import os
+import settings as s
 
-ECHO = True
-DEBUG = False
 while True:
     text = input("# ")
 
     if text == "echo on":
-        ECHO = True 
+        s.ECHO = True 
         continue
     elif text == "echo off":
-        ECHO = False
+        s.ECHO = False
         continue
     if text == "debug on":
-        DEBUG = True
+        s.DEBUG = True
         continue
     elif text == "debug off":
-        DEBUG = False
+        s.DEBUG = False
+        continue
+    elif text == "clear":
+        os.system("cls")
         continue
 
-    if ECHO == True:
+    if s.ECHO == True:
         print(text)
 
-    jam.Tokenizer(text, DEBUG) #pass jam tokenizer
+    jam.Tokenizer(text, s.DEBUG) #pass jam tokenizer
