@@ -57,6 +57,7 @@ class Tokenizer:
         statements = "iwlrf"
         symbols = "()[]}{,:+-*&!|=/.><"
         bools = "TF"
+        function_identifiers = "fd"
 
         while True:
             
@@ -79,8 +80,12 @@ class Tokenizer:
                 self.semicolon()
             elif char in INTEGERS:
                 self.addInt()
+            elif char in function_identifiers and self.addFunction() != -1:
+                self.addFunction()
             elif char in bools:
                 self.addBool()
+            elif char == 'i' and self.addInclude() != -1:
+                self.addInclude()
             elif char == -1:
                 break
             else:
@@ -90,7 +95,7 @@ class Tokenizer:
             for i in range(len(self.tokens)):
                 print(self.tokens[i].display()) #print the return of the display attribute in each token
         
-        Parser(self.tokens)
+        Parser(self.tokens, self.debug)
 
     def addOperators(self):
         
@@ -156,9 +161,9 @@ class Tokenizer:
         if char in possible_statements_from_char.keys():
             state = []
             for i in range(len(possible_statements_from_char[char])):
-                #if self.pos + i + 1 < len(self.text):
-                state.append(self.next_char(i))
-            if "".join(state) == possible_statements_from_char[char]:
+                if self.pos + i < len(self.text):
+                    state.append(self.next_char(i))
+            if str("".join(state)) == possible_statements_from_char[char]:
                 self.tokens.append(Token("statement", possible_statements_from_char[char]))
                 for i in range(len(possible_statements_from_char[char])):
                     self.forward()
@@ -182,6 +187,27 @@ class Tokenizer:
         number = "".join(number)
         self.tokens.append(Token("integer", number))
         self.forward()
+
+    def addFunction(self):
+        char = self.current_char()
+        funct = {
+        "d": "def",
+        "f": "function"
+        }
+        
+        if char in funct.keys():
+            state = []
+            for i in range(len(funct[char])):
+                if self.pos + i < len(self.text):
+                    state.append(self.next_char(i))
+                else:    
+                    break
+            if str("".join(state)) == funct[char]:
+                self.tokens.append(Token("function", funct[char]))
+                for i in range(len(funct[char])):
+                    self.forward()
+            else:
+                return -1
 
     def addBool(self):
         KW_True = "True"
@@ -232,8 +258,37 @@ class Tokenizer:
         expression = "".join(expression)
         self.tokens.append(Token("expression", expression))
 
-class Parser:
-    def __init__(self, tokens):
-        self.tokens = tokens
-        self.pos = 0
+    def addInclude(self):
         
+        state = []
+        if self.next_char(1) == 'm':
+            for i in range(len("import")):
+                if i + len("import") < len(self.text):
+                    state.append(self.next_char(i))
+                else:
+                    break
+            if str("".join(state)) == "import":
+                self.tokens.append(Token("module", "import"))
+                for i in range(len("import")):
+                    self.forward()
+            else:
+                return -1
+        
+        elif self.next_char(1) == 'n':
+            for i in range(len("include")):
+                if i + len("include") < len(self.text):
+                    state.append(self.next_char(i))
+                else:
+                    break
+            if str("".join(self.text)) == "include":
+                self.tokens.append(Token("module", "include"))
+                for i in range(len("include")):
+                    self.forward()
+        else:
+            return -1
+
+class Parser:
+    def __init__(self, tokens, debug):
+        self.tokens = tokens
+        self.debug = debug
+        self.pos = 0
