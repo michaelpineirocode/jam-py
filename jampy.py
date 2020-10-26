@@ -1,5 +1,7 @@
+#public variables. the deliminators do not need to be, but in case I want to change them later.
 INTEGERS = "0123456789"
-STRING_DELLIMINATOR = '"'
+STRING_DELIMINATOR = '"'
+EOL_DELIMINATOR = ';'
 
 class Token:
     def __init__(self, KW_type, value):  #takes a type and a value
@@ -11,12 +13,12 @@ class Token:
             return {self.KW_type: self.value} #if there is a value, displays the type and value
         else:
             return {self.KW_type: None} #displays just the type
-    
 
 class Tokenizer:
 
-    def __init__(self, text):
+    def __init__(self, text, debug):
         self.text = text #pulls the text
+        self.debug = debug # enables debug mode
         self.pos = 0 #current position
         self.current_char() #pulls the character at 0 in the string
         self.seperate() #starts the main seperator
@@ -25,9 +27,9 @@ class Tokenizer:
         if self.pos < len(self.text):
             return self.text[self.pos]
 
-    def next_char(self):
+    def next_char(self, distance):
         if self.pos < len(self.text) - 1:
-            return self.text[self.pos + 1]
+            return self.text[self.pos + distance]
         else:
             return -1
 
@@ -49,61 +51,87 @@ class Tokenizer:
         else:
             print("Start of sequence")
 
-    def symbols(self):
-        return "()[]}{,;:+-*&!=o"
-
     def seperate(self):
         self.tokens = []
-        ignore = " \t"
-        
+        ignore = " \t\n"
+        statements = "iwlrf"
+        symbols = "()[]}{,:+-*&!|=/.><"
+        bools = "TF"
+
         while True:
             
-            if self.current_char() == None:
+            char = self.current_char()
+
+            if char == None:
                 if self.forward() != "end of sequence":
                     self.forward()
                 else:
                     break
-            elif self.current_char() in ignore:
+            elif char in ignore:
                 self.forward()
-            elif self.current_char() in self.symbols():
-                self.testDuo()
-            elif self.current_char() in STRING_DELLIMINATOR:
+            elif char in symbols:
+                self.addOperators()
+            elif char == STRING_DELIMINATOR:
                 self.addString()
-            elif self.next_char() == -1:
+            elif char in statements and self.addStatements() != -1:
+                self.addStatements()
+            elif char == EOL_DELIMINATOR:
+                self.semicolon()
+            elif char in INTEGERS:
+                self.addInt()
+            elif char in bools:
+                self.addBool()
+            elif char == -1:
                 break
-
-        for i in range(len(self.tokens)):
-            print(self.tokens[i].display()) #print the return of the display attribute in each token
-            
-
-    def testDuo(self):
-        duoPairs = {
-            'o': 'r',
-            '!': '=',
-            '+': '=',
-            '-': '=',
-            '=': '=',
-            "&": "&",
-        }
-
-        char = self.current_char()
+            else:
+                self.addExpression()
         
-        if char in duoPairs.keys():
-            if self.next_char() == duoPairs[char]:
-                self.tokens.append(Token("bichar operator", char + self.next_char()))
-            elif char != duoPairs[char]:
-                self.tokens.append(Token("onechar operator", char))
+        if self.debug == True:
+            for i in range(len(self.tokens)):
+                print(self.tokens[i].display()) #print the return of the display attribute in each token
+        
+        Parser(self.tokens)
+
+    def addOperators(self):
+        
+        relational_operators = { #list of all two word combos 
+            '|': '||',
+            '!': '!=',
+            '+': '+=',
+            '-': '-=',
+            '=': '==',
+            "&": "&&",
+            "<": "<=",
+            ">": ">="                                                                                                                                                                                                      
+            }
+            
+        char = self.current_char()
+        if char in relational_operators.keys():
+            if self.next_char(1) == relational_operators[char][1]:
+                if char == '<' or char == '>' or char == '=' or char == '!':
+                    self.tokens.append(Token("relational operator", char + self.next_char(1)))
+                elif char == '&' or char == '|':
+                    self.tokens.append(Token("logical operator", char + self.next_char(1)))
+                elif char == "-" or char == "+":
+                    self.tokens.append(Token("arithmetic operator", char + self.next_char(1)))
+                self.forward()
+            elif char == "=":
+                self.tokens.append(Token("assignment", char))
+            elif char == '+' or char == '-' or char:
+                self.tokens.append(Token("arithmetic operator", char))
+        elif char == '*' or char =='/':
+            self.tokens.append(Token("arithmetic operator", char))
         else:
             self.tokens.append(Token("symbol", char))
-        
-        self.forward()
 
+        self.forward()
+                
     def addString(self):
         kw_string=[]
         start_pos = self.pos
         while True:
             self.forward()
-            if self.current_char() == STRING_DELLIMINATOR:
+            if self.current_char() == STRING_DELIMINATOR:
                 endString = self.pos
                 self.forward()
                 break
@@ -112,4 +140,100 @@ class Tokenizer:
         kw_string = "".join(kw_string)
             
         self.tokens.append(Token("string", kw_string))
+        self.forward()
 
+    def addStatements(self):
+        char = self.current_char()
+        possible_statements_from_char = {
+            "w": "while",
+            "r": "return",
+            "l": "let",
+            "f": "for",
+            "i": "if"
+        }
+    
+        starting_char = char
+        if char in possible_statements_from_char.keys():
+            state = []
+            for i in range(len(possible_statements_from_char[char])):
+                #if self.pos + i + 1 < len(self.text):
+                state.append(self.next_char(i))
+            if "".join(state) == possible_statements_from_char[char]:
+                self.tokens.append(Token("statement", possible_statements_from_char[char]))
+                for i in range(len(possible_statements_from_char[char])):
+                    self.forward()
+            else:
+                return -1
+
+    def semicolon(self):
+        self.tokens.append(Token("eol deliminator", EOL_DELIMINATOR))
+        self.forward()
+
+    def addInt(self):
+        number = []
+        while True:
+            char = self.current_char()
+            if str(char) in INTEGERS:
+                number.append(self.text[self.pos])
+                self.forward()
+            else:
+                break
+
+        number = "".join(number)
+        self.tokens.append(Token("integer", number))
+        self.forward()
+
+    def addBool(self):
+        KW_True = "True"
+        KW_False = "False"
+        state = []
+        if self.current_char() == KW_True[0]:
+            for i in range(len(KW_True)):
+                char = self.current_char()
+                if char == KW_True[i]:
+                    state.append(char)
+                    self.forward()
+                else:
+                    backpedal = i
+                    break
+            state = "".join(state)
+            if state == KW_True:
+                self.tokens.append(Token("Bool", state))
+            else:
+                for i in range(backpedal):
+                    self.back()
+        else:
+            for i in range(len(KW_False)):
+                char = self.current_char()
+                if char == KW_False[i]:
+                    state.append(char)
+                    self.forward()
+                else:
+                    backpedal = i
+                    break
+            state = "".join(state)
+            if state == KW_False:
+                self.tokens.append(Token("Bool", state))
+            else:
+                for i in range(backpedal):
+                    self.back()
+
+    def addExpression(self):
+
+        letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_-" #should this be public?
+        expression = []
+        while True:
+            char = self.current_char()
+            if str(char) in letters:
+                expression.append(char)
+                self.forward()
+            else:
+                break
+        expression = "".join(expression)
+        self.tokens.append(Token("expression", expression))
+
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.pos = 0
+        
