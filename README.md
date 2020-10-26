@@ -1,4 +1,4 @@
-![alt text](https://github.com/michaelpineirocode/jam-py/blob/main/jampypic-removebg-preview)
+![alt text](https://github.com/michaelpineirocode/jam-py/blob/main/jampypic-removebg-preview.png?raw=true)
 
 # JAM-PY
 
