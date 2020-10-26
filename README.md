@@ -10,19 +10,19 @@ To install jampy,
 
 # Shell commands
 The shell utilizes the following specialized commands:
->echo on/off - reprint the command.
->debug on/off - turns on debug mode. As of now, debug only displays tokens registered by the tokenizer.
->clear - clears the shell. Only works with Windows computers, as of now.
->help - prints the list of commands and descriptions
+-echo on/off - reprint the command.
+-debug on/off - turns on debug mode. As of now, debug only displays tokens registered by the tokenizer.
+-clear - clears the shell. Only works with Windows computers, as of now.
+-help - prints the list of commands and descriptions
 
 # Dependencies
 Jampy relies on the following dependencies:
->built-in "os" module.
->python3 and up.
+-built-in "os" module.
+-python3 and up.
 
 # Motivation
 
-Jam-py is one of my ongoing projects to learn about interpreted programming languages. It has uses in many forms though, through the development of a lexer and parser, which have use cases including but not limited to translators, grammer checkers, and interpreted programming languages.
+Jampy is one of my ongoing projects to learn about interpreted programming languages. It has uses in many forms though, through the development of a lexer and parser, which have use cases including but not limited to translators, grammer checkers, and interpreted programming languages.
 
 # Build Status
 
