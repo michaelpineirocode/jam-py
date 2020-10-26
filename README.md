@@ -1,6 +1,8 @@
+![alt text](https://github.com/michaelpineirocode/jam-py/blob/main/jampypic-removebg-preview)
+
 # JAM-PY
 
-Jam-py is a <b>proof of concept/educational experience</b> to learn the fundementals of interpreted programming languages. It is developed inside of Python, but the same approaches can be made in lower level programming languages. I am interested to see if I can implement a similar project in C++.
+Jam-py is a <b>proof of concept/educational experience</b> to learn the fundementals of interpreted programming languages. It is developed inside of Python, but the same approaches can be made in lower level programming languages. I am interested to see if I can implement a similar project in C++ in the future. I currently plan on creating a lexer and a parser, and then I may come back to create an interpretor in the future.
 
 # Motivation
 
