@@ -6,7 +6,7 @@ Jam-py is a <b>proof of concept/educational experience</b> to learn the fundemen
 
 # Motivation
 
-Jam-py is one of my ongoing projects to learn about interpreted programming languages. It has uses in many forms though, through the development of a lexer and parser, which have many use cases.
+Jam-py is one of my ongoing projects to learn about interpreted programming languages. It has uses in many forms though, through the development of a lexer and parser, which have use cases including but not limited to translators, grammer checkers, and interpreted programming languages.
 
 # Build Status
 
