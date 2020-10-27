@@ -5,21 +5,21 @@
 Jam-py is a <b>proof of concept/educational experience</b> to learn the fundementals of compiled interpreted programming languages. It is developed inside of Python, but the same approaches can be made in lower level programming languages. I am interested to see if I can implement a similar project in C++ in the future. I currently plan on creating a lexer and a parser, and then I may come back to create an interpretor in the future.
 
 # Install
-Jampy relies on the "os" module for the "clear" command within the shell, so "clear" will not work on Linux or Unix systems.
-<b> GIT INSTALL:</b> git clone https://github.com/michaelpineirocode/jampy.git .
+Jampy relies on the "os" module for the "clear" command within the shell, so "clear" will not work on Linux or Unix systems.  
+<b> GIT INSTALL:</b> git clone https://github.com/michaelpineirocode/jampy.git .  
 <b> ZIP INSTALL:</b> Click on the green "download" button at the top of the repository, select "ZIP" and download. Find the directory of the download and decompress.
 
 # Shell commands
-The shell utilizes the following specialized commands:
--echo on/off - reprint the command.
--debug on/off - turns on debug mode. As of now, debug only displays tokens registered by the tokenizer.
--clear - clears the shell. Only works with Windows computers, as of now.
--help - prints the list of commands and descriptions
+The shell utilizes the following specialized commands:  
+-echo on/off - reprint the command.  
+-debug on/off - turns on debug mode. As of now, debug only displays tokens registered by the tokenizer.  
+-clear - clears the shell. Only works with Windows computers, as of now.  
+-help - prints the list of commands and descriptions  
 
 # Dependencies
-Jampy relies on the following dependencies:
--built-in "os" module.
--python3 and up.
+Jampy relies on the following dependencies:  
+-built-in "os" module.  
+-python3 and up.  
 
 # Motivation
 
