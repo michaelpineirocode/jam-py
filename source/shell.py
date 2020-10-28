@@ -18,10 +18,27 @@ while True:
         s.DEBUG = False
         continue
     elif text == "clear":
-        os.system("cls")
+        try:
+            os.system("cls")
+        except:
+            print("cannot clear")
         continue
+    elif text == "help":
+        f = open("help.txt", "r")
+        print(f.read())
+        f.close()
+        continue
+    elif text == "insert":
+        path = input("Path: ")
+        try:
+            script = open(path, "r").read()
+            jam.Tokenizer(str(script), s.DEBUG)
+            continue
+        except:
+            print("Invalid path")
+            continue    
 
     if s.ECHO == True:
-        print(text)
+        print(text) 
 
-    jam.Tokenizer(text, s.DEBUG) #pass jam tokenizer
+    jam.Tokenizer(str(text), s.DEBUG) #pass jam tokenizer
