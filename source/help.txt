@@ -1,0 +1,9 @@
+>echo on/off - reprint the command.
+
+>debug on/off - turns on debug mode. As of now, debug only displays tokens registered by the tokenizer.
+
+>clear - clears the shell. Only works with Windows computers, as of now.
+
+>help - prints the list of commands and descriptions
+
+>insert - prompts to provide a path for a script to be used.
