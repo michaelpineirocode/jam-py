@@ -11,8 +11,6 @@ class Token:
     def display(self):
         if self.value:
             return {self.KW_type: self.value} #if there is a value, displays the type and value
-        else:
-            return {self.KW_type: None} #displays just the type
 
 class Tokenizer:
 
@@ -122,8 +120,10 @@ class Tokenizer:
                 self.forward()
             elif char == "=":
                 self.tokens.append(Token("assignment", char))
-            elif char == '+' or char == '-' or char:
+            elif char == '+' or char == '-':
                 self.tokens.append(Token("arithmetic operator", char))
+            elif char == '<' or char == '>':
+                self.tokens.append(Token("relational operator", char))
         elif char == '*' or char =='/':
             self.tokens.append(Token("arithmetic operator", char))
         else:
@@ -134,18 +134,27 @@ class Tokenizer:
     def addString(self):
         kw_string=[]
         start_pos = self.pos
+        isString = True
         while True:
             self.forward()
             if self.current_char() == STRING_DELIMINATOR:
                 endString = self.pos
                 self.forward()
                 break
+            elif self.pos == len(self.text):
+                isString = False
+                endString = start_pos - 1
+                break
+
         for i in range(endString - (start_pos - 1)):
             kw_string.append(self.text[start_pos + i])
         kw_string = "".join(kw_string)
-            
-        self.tokens.append(Token("string", kw_string))
-        self.forward()
+        
+        if isString:
+            self.tokens.append(Token("string", kw_string))
+        else:
+            print("Odd number of string deliminators at character position " + str(start_pos))
+            self.forward()
 
     def addStatements(self):
         char = self.current_char()
@@ -157,12 +166,14 @@ class Tokenizer:
             "i": "if"
         }
     
-        starting_char = char
         if char in possible_statements_from_char.keys():
             state = []
             for i in range(len(possible_statements_from_char[char])):
                 if self.pos + i < len(self.text):
                     state.append(self.next_char(i))
+                elif self.pos + i == len(self.text):
+                    return -1
+    
             if str("".join(state)) == possible_statements_from_char[char]:
                 self.tokens.append(Token("statement", possible_statements_from_char[char]))
                 for i in range(len(possible_statements_from_char[char])):
@@ -179,14 +190,12 @@ class Tokenizer:
         while True:
             char = self.current_char()
             if str(char) in INTEGERS:
-                number.append(self.text[self.pos])
+                number.append(self.current_char())
                 self.forward()
             else:
+                number = "".join(number)
+                self.tokens.append(Token("integer", number))
                 break
-
-        number = "".join(number)
-        self.tokens.append(Token("integer", number))
-        self.forward()
 
     def addFunction(self):
         char = self.current_char()
@@ -200,6 +209,8 @@ class Tokenizer:
             for i in range(len(funct[char])):
                 if self.pos + i < len(self.text):
                     state.append(self.next_char(i))
+                elif self.pos + i == len(self.text):
+                    return -1
                 else:    
                     break
             if str("".join(state)) == funct[char]:
@@ -265,6 +276,8 @@ class Tokenizer:
             for i in range(len("import")):
                 if i + len("import") < len(self.text):
                     state.append(self.next_char(i))
+                elif self.pos + i == len(self.text):
+                    return -1
                 else:
                     break
             if str("".join(state)) == "import":
@@ -292,3 +305,6 @@ class Parser:
         self.tokens = tokens
         self.debug = debug
         self.pos = 0
+        self.parserTokens = {
+            
+        }
