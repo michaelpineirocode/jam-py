@@ -15,6 +15,7 @@ The shell utilizes the following specialized commands:
 -debug on/off - turns on debug mode. As of now, debug only displays tokens registered by the tokenizer.  
 -clear - clears the shell. Only works with Windows computers, as of now.  
 -help - prints the list of commands and descriptions  
+-insert - prompts to provide a path for a script to be used.  
 
 # Dependencies
 Jampy relies on the following dependencies:  
@@ -27,13 +28,15 @@ Jampy is one of my ongoing projects to learn about interpreted programming langu
 
 # Build Status
 
-Working, not functional
+The tokenizer is working, the parser and interpreter are still in development. If you find a bug, please contact me with the information below.
 
 # Limitations
 
-<b>There cannot be a term that starts with the name of words in our namespace.</b> For example, "define" and "functionality" could not be variable names, because they contain the key words "def" and "function" at the beginning. I do not think that this issue is massive, though, and I may be able to change it later.
+<b>There cannot be a term that starts with the name of words in our namespace.</b> For example, "define" and "functionality" could not be variable names, because they contain the key words "def" and "function" at the beginning. Doing this results in the tokenizer outputing {"function": "function"} {"expression": "ality"}. I do not think that this issue is massive, though, and I may be able to change it later.
 
-<b>It is slow.</b> The text is interpreted using python, to make a language that is less easy to understand. It performs the way that a 'high level' programming language should(slowly), yet is written in a way that is 'lower level' (more complicated).
+<b>It is slow.</b> The text is interpreted using python, to make a language that is less easy to understand. It performs the way that a 'high level' programming language should(slowly), yet is written in a way that is 'lower level' (more complicated).  
+
+<b>You cannot use single quotes.</b> The tokenizer completely ignores them.
 
 # Demo
 Once I make a release, I will include a demo - probably a link to a jupyter or collabratory notebook. I am not yet sure how to implement this. Or, you can just download it.
