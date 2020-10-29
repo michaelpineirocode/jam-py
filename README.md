@@ -36,7 +36,7 @@ The tokenizer is working, the parser and interpreter are still in development. I
 
 <b>It is slow.</b> The text is interpreted using python, to make a language that is less easy to understand. It performs the way that a 'high level' programming language should(slowly), yet is written in a way that is 'lower level' (more complicated).  
 
-<b>You cannot use single quotes.</b> The tokenizer completely ignores them.
+<b>You cannot use single quotes.</b> The tokenizer completely ignores them, except for in strings.
 
 # Demo
 Once I make a release, I will include a demo - probably a link to a jupyter or collabratory notebook. I am not yet sure how to implement this. Or, you can just download it.
